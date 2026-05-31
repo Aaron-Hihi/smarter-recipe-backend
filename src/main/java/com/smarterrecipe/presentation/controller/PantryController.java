@@ -1,8 +1,8 @@
 package com.smarterrecipe.presentation.controller;
 
 import com.smarterrecipe.application.handler.PantryHandler;
-import com.smarterrecipe.presentation.dto.PantryRequest;
-import com.smarterrecipe.presentation.dto.PantryResponse;
+import com.smarterrecipe.presentation.dto.pantry.PantryRequest;
+import com.smarterrecipe.presentation.dto.pantry.PantryResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

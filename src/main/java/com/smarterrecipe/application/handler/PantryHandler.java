@@ -2,8 +2,8 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.Pantry;
 import com.smarterrecipe.data.repository.PantryRepository;
-import com.smarterrecipe.presentation.dto.PantryRequest;
-import com.smarterrecipe.presentation.dto.PantryResponse;
+import com.smarterrecipe.presentation.dto.pantry.PantryRequest;
+import com.smarterrecipe.presentation.dto.pantry.PantryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
