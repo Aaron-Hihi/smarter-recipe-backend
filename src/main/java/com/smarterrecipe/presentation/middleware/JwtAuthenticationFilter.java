@@ -41,6 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+
+        System.out.println("=== TOKEN DITERIMA DARI POSTMAN ===");
+        System.out.println("[" + jwt + "]");
+        System.out.println("===================================");
+
         username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
