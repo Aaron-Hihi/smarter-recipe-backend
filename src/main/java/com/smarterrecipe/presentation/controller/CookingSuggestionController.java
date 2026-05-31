@@ -1,12 +1,12 @@
 package com.smarterrecipe.presentation.controller;
 
 import com.smarterrecipe.application.handler.CookingSuggestionHandler;
-import com.smarterrecipe.presentation.dto.RecipeResponse;
+import com.smarterrecipe.presentation.dto.CookingSuggestionRequest;
+import com.smarterrecipe.presentation.dto.SuggestionResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,8 +17,9 @@ public class CookingSuggestionController {
 
     private final CookingSuggestionHandler cookingSuggestionHandler;
 
-    @GetMapping
-    public ResponseEntity<List<RecipeResponse>> getCookingSuggestions() {
-        return ResponseEntity.ok(cookingSuggestionHandler.getCookingSuggestions());
+    @PostMapping("/search")
+    public ResponseEntity<List<SuggestionResponse>> getCookingSuggestions(
+            @Valid @RequestBody CookingSuggestionRequest request) {
+        return ResponseEntity.ok(cookingSuggestionHandler.getSuggestions(request));
     }
 }

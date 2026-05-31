@@ -1,17 +1,19 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.Recipe;
-import com.smarterrecipe.data.entity.User;
+import com.smarterrecipe.data.entity.*;
+import com.smarterrecipe.data.repository.RecipeIngredientSubstitutionRepository;
 import com.smarterrecipe.data.repository.RecipeRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.domain.engine.MatchingEngine;
 import com.smarterrecipe.domain.model.enums.RecipeStatus;
-import com.smarterrecipe.presentation.dto.RecipeResponse;
+import com.smarterrecipe.presentation.dto.CookingSuggestionRequest;
+import com.smarterrecipe.presentation.dto.SuggestionResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,49 +21,60 @@ import java.util.stream.Collectors;
 public class CookingSuggestionHandler {
 
     private final RecipeRepository recipeRepository;
-    private final UserRepository userRepository;
+    private final RecipeIngredientSubstitutionRepository substitutionRepository;
+    private final MatchingEngine matchingEngine;
 
     @Transactional(readOnly = true)
-    public List<RecipeResponse> getCookingSuggestions() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public List<SuggestionResponse> getSuggestions(CookingSuggestionRequest request) {
+        List<Recipe> recipes = recipeRepository.findByStatus(RecipeStatus.PUBLISHED);
+        Set<Long> ownedIds = Set.copyOf(request.getOwnedIngredientIds());
 
-        List<Recipe> suggestedRecipes = recipeRepository.findSuggestionsByUserId(user.getId(), RecipeStatus.PUBLISHED);
-
-        return suggestedRecipes.stream()
-                .map(this::mapToResponse)
+        return recipes.stream()
+                .map(recipe -> evaluateRecipe(recipe, ownedIds))
+                .sorted((a, b) -> Double.compare(b.getMatchScore(), a.getMatchScore()))
                 .collect(Collectors.toList());
     }
 
-    private RecipeResponse mapToResponse(Recipe recipe) {
-        List<RecipeResponse.StepResponse> steps = recipe.getRecipeSteps() != null ?
-                recipe.getRecipeSteps().stream()
-                        .map(step -> RecipeResponse.StepResponse.builder()
-                                .stepNumber(step.getStepNumber())
-                                .instruction(step.getInstruction())
-                                .build())
-                        .collect(Collectors.toList()) : List.of();
+    private SuggestionResponse evaluateRecipe(Recipe recipe, Set<Long> ownedIds) {
+        List<Long> requiredIds = extractRequiredIngredients(recipe);
+        List<Long> effectiveOwnedIds = resolveSubstitutions(recipe, ownedIds);
 
-        List<RecipeResponse.IngredientResponse> ingredients = recipe.getRecipeIngredients() != null ?
-                recipe.getRecipeIngredients().stream()
-                        .map(ing -> RecipeResponse.IngredientResponse.builder()
-                                .ingredientName(ing.getIngredient().getName())
-                                .amount(ing.getAmount())
-                                .unit(ing.getUnit())
-                                .build())
-                        .collect(Collectors.toList()) : List.of();
+        MatchingEngine.MatchResult result = matchingEngine.evaluateRecipeMatch(effectiveOwnedIds, requiredIds);
 
-        return RecipeResponse.builder()
+        return buildResponse(recipe, result);
+    }
+
+    private List<Long> extractRequiredIngredients(Recipe recipe) {
+        return recipe.getRecipeIngredients().stream()
+                .map(ri -> ri.getIngredient().getId())
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> resolveSubstitutions(Recipe recipe, Set<Long> ownedIds) {
+        List<Long> effectiveOwned = new ArrayList<>(ownedIds);
+
+        for (RecipeIngredient ri : recipe.getRecipeIngredients()) {
+            if (!ownedIds.contains(ri.getIngredient().getId()) && hasValidSubstitute(ri, ownedIds)) {
+                effectiveOwned.add(ri.getIngredient().getId());
+            }
+        }
+        return effectiveOwned;
+    }
+
+    private boolean hasValidSubstitute(RecipeIngredient ri, Set<Long> ownedIds) {
+        List<RecipeIngredientSubstitution> subs = substitutionRepository.findByRecipeIngredient(ri);
+        return subs.stream()
+                .anyMatch(sub -> ownedIds.contains(sub.getSubstituteIngredient().getId()));
+    }
+
+    private SuggestionResponse buildResponse(Recipe recipe, MatchingEngine.MatchResult result) {
+        return SuggestionResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
-                .description(recipe.getDescription())
-                .creatorName(recipe.getCreator().getUsername())
+                .thumbnailUrl(recipe.getThumbnailUrl())
                 .preparationTime(recipe.getPreparationTime())
-                .servingSize(recipe.getServingSize())
-                .status(recipe.getStatus().name())
-                .steps(steps)
-                .ingredients(ingredients)
+                .matchScore(result.matchScore())
+                .missingIngredientIds(result.missingIngredientIds())
                 .build();
     }
 }
