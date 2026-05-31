@@ -2,6 +2,7 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.*;
 import com.smarterrecipe.data.repository.*;
+import com.smarterrecipe.domain.engine.DietaryRuleEngine;
 import com.smarterrecipe.domain.model.enums.RecipeStatus;
 import com.smarterrecipe.presentation.dto.RecipeCreateRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,18 +23,44 @@ public class RecipeCommandHandler {
     private final IngredientRepository ingredientRepository;
     private final PantryRepository pantryRepository;
     private final DietaryTagRepository dietaryTagRepository;
-
     private final RecipeStepRepository recipeStepRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final RecipePantryRepository recipePantryRepository;
     private final RecipeDietaryTagRepository recipeDietaryTagRepository;
 
+    private final DietaryRuleEngine dietaryRuleEngine;
+
     @Transactional
     public String createRecipe(RecipeCreateRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User creator = getCurrentAuthenticatedUser();
 
+        List<Long> ingredientIds = extractIngredientIds(request);
+        dietaryRuleEngine.validateDietaryTags(ingredientIds, request.getDietaryTagIds());
+
+        Recipe recipe = initializeBaseRecipe(request, creator);
+        recipe = recipeRepository.save(recipe);
+
+        saveRecipeSteps(recipe, request.getSteps());
+        saveRecipeIngredients(recipe, request.getIngredients());
+        saveRecipePantries(recipe, request.getPantryIds());
+        saveRecipeDietaryTags(recipe, request.getDietaryTagIds());
+
+        return "Recipe successfully created with ID: " + recipe.getId();
+    }
+
+    private User getCurrentAuthenticatedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    private List<Long> extractIngredientIds(RecipeCreateRequest request) {
+        return request.getIngredients().stream()
+                .map(RecipeCreateRequest.RecipeIngredientRequest::getIngredientId)
+                .collect(Collectors.toList());
+    }
+
+    private Recipe initializeBaseRecipe(RecipeCreateRequest request, User creator) {
         Recipe recipe = new Recipe();
         recipe.setCreator(creator);
         recipe.setTitle(request.getTitle());
@@ -40,19 +69,23 @@ public class RecipeCommandHandler {
         recipe.setServingSize(request.getServingSize());
         recipe.setStatus(RecipeStatus.PUBLISHED);
         recipe.setCreatedAt(LocalDateTime.now());
-        recipe = recipeRepository.save(recipe);
+        return recipe;
+    }
 
-        for (RecipeCreateRequest.StepRequest stepReq : request.getSteps()) {
+    private void saveRecipeSteps(Recipe recipe, List<RecipeCreateRequest.StepRequest> steps) {
+        for (RecipeCreateRequest.StepRequest stepReq : steps) {
             RecipeStep step = new RecipeStep();
             step.setRecipe(recipe);
             step.setStepNumber(stepReq.getStepNumber());
             step.setInstruction(stepReq.getInstruction());
             recipeStepRepository.save(step);
         }
+    }
 
-        for (RecipeCreateRequest.RecipeIngredientRequest ingReq : request.getIngredients()) {
+    private void saveRecipeIngredients(Recipe recipe, List<RecipeCreateRequest.RecipeIngredientRequest> ingredients) {
+        for (RecipeCreateRequest.RecipeIngredientRequest ingReq : ingredients) {
             Ingredient ingredient = ingredientRepository.findById(ingReq.getIngredientId())
-                    .orElseThrow(() -> new IllegalArgumentException("Ingredient ID " + ingReq.getIngredientId() + " not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("Ingredient not found"));
 
             RecipeIngredient recipeIngredient = new RecipeIngredient();
             recipeIngredient.setRecipe(recipe);
@@ -61,31 +94,31 @@ public class RecipeCommandHandler {
             recipeIngredient.setUnit(ingReq.getUnit());
             recipeIngredientRepository.save(recipeIngredient);
         }
+    }
 
-        if (request.getPantryIds() != null) {
-            for (Long pantryId : request.getPantryIds()) {
-                Pantry pantry = pantryRepository.findById(pantryId)
-                        .orElseThrow(() -> new IllegalArgumentException("Pantry ID " + pantryId + " not found"));
+    private void saveRecipePantries(Recipe recipe, List<Long> pantryIds) {
+        if (pantryIds == null) return;
+        for (Long pantryId : pantryIds) {
+            Pantry pantry = pantryRepository.findById(pantryId)
+                    .orElseThrow(() -> new IllegalArgumentException("Pantry not found"));
 
-                RecipePantry recipePantry = new RecipePantry();
-                recipePantry.setRecipe(recipe);
-                recipePantry.setPantry(pantry);
-                recipePantryRepository.save(recipePantry);
-            }
+            RecipePantry recipePantry = new RecipePantry();
+            recipePantry.setRecipe(recipe);
+            recipePantry.setPantry(pantry);
+            recipePantryRepository.save(recipePantry);
         }
+    }
 
-        if (request.getDietaryTagIds() != null) {
-            for (Long tagId : request.getDietaryTagIds()) {
-                DietaryTag tag = dietaryTagRepository.findById(tagId)
-                        .orElseThrow(() -> new IllegalArgumentException("Dietary Tag ID " + tagId + " not found"));
+    private void saveRecipeDietaryTags(Recipe recipe, List<Long> tagIds) {
+        if (tagIds == null) return;
+        for (Long tagId : tagIds) {
+            DietaryTag tag = dietaryTagRepository.findById(tagId)
+                    .orElseThrow(() -> new IllegalArgumentException("Dietary Tag not found"));
 
-                RecipeDietaryTag recipeTag = new RecipeDietaryTag();
-                recipeTag.setRecipe(recipe);
-                recipeTag.setDietaryTag(tag);
-                recipeDietaryTagRepository.save(recipeTag);
-            }
+            RecipeDietaryTag recipeTag = new RecipeDietaryTag();
+            recipeTag.setRecipe(recipe);
+            recipeTag.setDietaryTag(tag);
+            recipeDietaryTagRepository.save(recipeTag);
         }
-
-        return "Recipe successfully created with ID: " + recipe.getId();
     }
 }
