@@ -3,10 +3,14 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "audit_logs")
+@EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
 public class AuditLog {
     @Id
@@ -26,12 +30,13 @@ public class AuditLog {
     @Column(name = "target_id")
     private Long targetId;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "details", columnDefinition = "TEXT")
     private String details;
 
     @Column(name = "ip_address")
     private String ipAddress;
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }

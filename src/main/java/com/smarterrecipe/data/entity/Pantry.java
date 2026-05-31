@@ -3,6 +3,8 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,5 +21,5 @@ public class Pantry {
     private String description;
 
     @OneToMany(mappedBy = "pantry")
-    private List<RecipePantry> recipePantries;
+    private List<RecipePantry> recipePantries = new ArrayList<>();
 }

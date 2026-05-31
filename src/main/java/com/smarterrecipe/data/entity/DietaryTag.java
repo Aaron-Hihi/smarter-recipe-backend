@@ -3,7 +3,6 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
 
 @Entity
 @Table(name = "dietary_tags")
@@ -16,8 +15,6 @@ public class DietaryTag {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(length = 255)
     private String description;
-
-    @OneToMany(mappedBy = "dietaryTag")
-    private List<DietaryIngredientRestriction> restrictions;
 }

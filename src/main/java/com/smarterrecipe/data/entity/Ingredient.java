@@ -3,7 +3,6 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
 
 @Entity
 @Table(name = "ingredients")
@@ -15,7 +14,4 @@ public class Ingredient {
 
     @Column(nullable = false, unique = true)
     private String name;
-
-    @OneToMany(mappedBy = "ingredient")
-    private List<RecipeIngredient> recipeIngredients;
 }

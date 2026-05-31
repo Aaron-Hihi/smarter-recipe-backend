@@ -3,10 +3,14 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_follows")
+@EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
 public class UserFollows {
     @Id
@@ -21,6 +25,7 @@ public class UserFollows {
     @JoinColumn(name = "followee_id", nullable = false)
     private User followee;
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }

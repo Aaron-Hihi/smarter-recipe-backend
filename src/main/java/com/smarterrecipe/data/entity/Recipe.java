@@ -1,13 +1,19 @@
 package com.smarterrecipe.data.entity;
 
+import com.smarterrecipe.domain.model.enums.RecipeStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "recipes")
+@EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
 public class Recipe {
     @Id
@@ -33,7 +39,9 @@ public class Recipe {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private RecipeStatus status = RecipeStatus.DRAFTED;
 
     @Column(name = "rejection_reason")
     private String rejectionReason;
@@ -44,18 +52,19 @@ public class Recipe {
     @Column(name = "total_reviews")
     private Integer totalReviews;
 
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "recipe")
-    private List<RecipeIngredient> recipeIngredients;
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeStep> recipeSteps = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe")
-    private List<RecipeStep> recipeSteps;
+    private List<RecipeDietaryTag> recipeDietaryTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipe")
-    private List<RecipeDietaryTag> recipeDietaryTags;
-
-    @OneToMany(mappedBy = "recipe")
-    private List<RecipePantry> recipePantries;
+    private List<RecipePantry> recipePantries = new ArrayList<>();
 }
