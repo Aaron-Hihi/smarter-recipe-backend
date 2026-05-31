@@ -1,7 +1,7 @@
 package com.smarterrecipe.presentation.controller;
 
 import com.smarterrecipe.application.handler.UserHandler;
-import com.smarterrecipe.presentation.dto.UserResponse;
+import com.smarterrecipe.presentation.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

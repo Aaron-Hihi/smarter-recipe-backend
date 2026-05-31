@@ -1,9 +1,9 @@
 package com.smarterrecipe.presentation.controller;
 
 import com.smarterrecipe.application.handler.AuthHandler;
-import com.smarterrecipe.presentation.dto.AuthResponse;
-import com.smarterrecipe.presentation.dto.LoginRequest;
-import com.smarterrecipe.presentation.dto.RegisterRequest;
+import com.smarterrecipe.presentation.dto.auth.AuthResponse;
+import com.smarterrecipe.presentation.dto.auth.LoginRequest;
+import com.smarterrecipe.presentation.dto.auth.RegisterRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

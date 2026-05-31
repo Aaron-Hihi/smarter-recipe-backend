@@ -1,7 +1,7 @@
 package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.repository.UserRepository;
-import com.smarterrecipe.presentation.dto.UserResponse;
+import com.smarterrecipe.presentation.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

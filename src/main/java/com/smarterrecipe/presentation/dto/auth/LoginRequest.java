@@ -1,4 +1,4 @@
-package com.smarterrecipe.presentation.dto;
+package com.smarterrecipe.presentation.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

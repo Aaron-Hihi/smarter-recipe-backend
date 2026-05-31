@@ -1,4 +1,4 @@
-package com.smarterrecipe.presentation.dto;
+package com.smarterrecipe.presentation.dto.ingredient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

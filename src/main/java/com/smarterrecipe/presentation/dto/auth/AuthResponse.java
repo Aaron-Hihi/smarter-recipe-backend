@@ -1,4 +1,4 @@
-package com.smarterrecipe.presentation.dto;
+package com.smarterrecipe.presentation.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
