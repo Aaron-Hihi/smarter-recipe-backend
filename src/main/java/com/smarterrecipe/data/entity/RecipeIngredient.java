@@ -3,7 +3,8 @@ package com.smarterrecipe.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "recipe_ingredients")
@@ -25,5 +26,5 @@ public class RecipeIngredient {
     private String unit;
 
     @OneToMany(mappedBy = "recipeIngredient")
-    private List<RecipeIngredientSubstitution> substitutions;
+    private Set<RecipeIngredientSubstitution> substitutions = new LinkedHashSet<>();
 }

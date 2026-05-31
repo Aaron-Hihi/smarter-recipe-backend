@@ -2,6 +2,7 @@ package com.smarterrecipe.domain.service;
 
 import com.smarterrecipe.data.entity.Recipe;
 import com.smarterrecipe.data.repository.RecipeRepository;
+import com.smarterrecipe.domain.model.enums.RecipeStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -17,7 +18,7 @@ public class RecipeService {
     }
 
     public List<Recipe> searchRecipes(String keyword) {
-        return recipeRepository.findByTitleContainingIgnoreCaseAndStatus(keyword, "APPROVED");
+        return recipeRepository.findByTitleContainingIgnoreCaseAndStatus(keyword, RecipeStatus.PUBLISHED);
     }
 
     public List<Recipe> getDietRecommendations(String tagName) {

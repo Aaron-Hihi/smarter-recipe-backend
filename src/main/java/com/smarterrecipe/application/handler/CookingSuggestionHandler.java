@@ -1,7 +1,6 @@
 package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.*;
-import com.smarterrecipe.data.repository.RecipeIngredientSubstitutionRepository;
 import com.smarterrecipe.data.repository.RecipeRepository;
 import com.smarterrecipe.domain.engine.MatchingEngine;
 import com.smarterrecipe.domain.model.enums.RecipeStatus;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 public class CookingSuggestionHandler {
 
     private final RecipeRepository recipeRepository;
-    private final RecipeIngredientSubstitutionRepository substitutionRepository;
     private final MatchingEngine matchingEngine;
 
     @Transactional(readOnly = true)
@@ -62,8 +60,10 @@ public class CookingSuggestionHandler {
     }
 
     private boolean hasValidSubstitute(RecipeIngredient ri, Set<Long> ownedIds) {
-        List<RecipeIngredientSubstitution> subs = substitutionRepository.findByRecipeIngredient(ri);
-        return subs.stream()
+        if (ri.getSubstitutions() == null) {
+            return false;
+        }
+        return ri.getSubstitutions().stream()
                 .anyMatch(sub -> ownedIds.contains(sub.getSubstituteIngredient().getId()));
     }
 
