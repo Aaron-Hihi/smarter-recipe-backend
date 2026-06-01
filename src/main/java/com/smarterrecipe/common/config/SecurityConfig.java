@@ -27,6 +27,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/recipes/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/followers").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/following").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/follow-counts").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
         )
