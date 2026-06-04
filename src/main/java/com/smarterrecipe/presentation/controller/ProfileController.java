@@ -25,13 +25,11 @@ public class ProfileController {
 
     @PutMapping
     public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody ProfileUpdateRequest request, Principal principal) {
-        // Stub implementation, returning current profile
-        return ResponseEntity.ok(new ApiResponse<>(userHandler.getProfile(principal.getName())));
+        return ResponseEntity.ok(new ApiResponse<>(userHandler.updateProfile(principal.getName(), request.getName(), request.getBio())));
     }
 
     @PutMapping("/dietary")
     public ResponseEntity<ApiResponse<UserResponse>> updateDietaryPreferences(@RequestBody DietaryPreferencesRequest request, Principal principal) {
-        // Stub implementation, returning current profile
-        return ResponseEntity.ok(new ApiResponse<>(userHandler.getProfile(principal.getName())));
+        return ResponseEntity.ok(new ApiResponse<>(userHandler.updateDietaryPreferences(principal.getName(), request)));
     }
 }

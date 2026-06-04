@@ -38,4 +38,8 @@ public class UserService {
     public List<UserModel> getAllUsers() {
         return repository.getAll();
     }
+
+    public UserModel updateUser(UserModel model) {
+        return repository.save(model);
+    }
 }

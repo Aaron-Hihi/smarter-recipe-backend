@@ -28,6 +28,12 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -40,6 +46,12 @@ public class User implements UserDetails {
 
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
+
+    @Column(name = "is_banned", nullable = false)
+    private Boolean isBanned = false;
+
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
