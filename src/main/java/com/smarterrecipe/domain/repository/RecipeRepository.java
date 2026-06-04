@@ -9,4 +9,6 @@ public interface RecipeRepository {
     List<RecipeModel> searchPublishedRecipes(String keyword);
     List<RecipeModel> getPublishedRecipesByTag(String tagName);
     RecipeModel saveRecipe(RecipeModel recipeModel);
+    void deleteRecipe(Long id);
+    boolean existsByTitle(String title);
 }

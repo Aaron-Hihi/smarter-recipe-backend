@@ -8,6 +8,7 @@ import com.smarterrecipe.presentation.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -31,5 +32,10 @@ public class ProfileController {
     @PutMapping("/dietary")
     public ResponseEntity<ApiResponse<UserResponse>> updateDietaryPreferences(@RequestBody DietaryPreferencesRequest request, Principal principal) {
         return ResponseEntity.ok(new ApiResponse<>(userHandler.updateDietaryPreferences(principal.getName(), request)));
+    }
+
+    @PostMapping("/picture")
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfilePicture(@RequestParam("file") MultipartFile file, Principal principal) {
+        return ResponseEntity.ok(new ApiResponse<>(userHandler.updateProfilePicture(principal.getName(), file)));
     }
 }

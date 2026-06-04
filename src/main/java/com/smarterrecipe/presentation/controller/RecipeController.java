@@ -24,7 +24,7 @@ public class RecipeController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<RecipeResponse>> createRecipe(@Valid @RequestBody RecipeCreateRequest request, Principal principal) {
-        com.smarterrecipe.domain.model.RecipeModel created = recipeCommandHandler.createRecipe(request.getTitle(), request.getIngredients(), principal.getName());
+        com.smarterrecipe.domain.model.RecipeModel created = recipeCommandHandler.createRecipe(request.getTitle(), request.getIngredients(), request.getTools(), principal.getName());
         return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getRecipeById(created.getId())));
     }
 
@@ -50,5 +50,11 @@ public class RecipeController {
         }
 
         return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getAllRecipes()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteRecipe(@PathVariable Long id, Principal principal) {
+        recipeCommandHandler.deleteRecipe(id, principal.getName());
+        return ResponseEntity.ok(new ApiResponse<>("Recipe deleted successfully"));
     }
 }

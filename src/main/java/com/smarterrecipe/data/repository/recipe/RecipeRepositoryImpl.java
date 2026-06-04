@@ -4,7 +4,9 @@ import com.smarterrecipe.data.entity.Recipe;
 import com.smarterrecipe.data.entity.RecipeStep;
 import com.smarterrecipe.data.entity.RecipeIngredient;
 import com.smarterrecipe.data.entity.Ingredient;
+import com.smarterrecipe.data.entity.Equipment;
 import com.smarterrecipe.data.repository.ingredient.IngredientJpaRepository;
+import com.smarterrecipe.data.repository.ingredient.EquipmentJpaRepository;
 import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.model.RecipeModel;
 import com.smarterrecipe.domain.model.enums.RecipeStatus;
@@ -25,6 +27,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     private final RecipeJpaRepository jpaRepository;
     private final IngredientJpaRepository ingredientJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final EquipmentJpaRepository equipmentJpaRepository;
 
     @Override
     @Cacheable(value = "recipes", key = "'allPublished'")
@@ -100,8 +103,35 @@ public class RecipeRepositoryImpl implements RecipeRepository {
             recipe.setRecipeIngredients(ingredients);
         }
 
+        if (model.getTools() != null) {
+            Set<com.smarterrecipe.data.entity.RecipeEquipment> tools = model.getTools().stream()
+                    .map(t -> {
+                        com.smarterrecipe.data.entity.RecipeEquipment re = new com.smarterrecipe.data.entity.RecipeEquipment();
+                        re.setRecipe(recipe);
+
+                        Equipment eq = equipmentJpaRepository.findByNameIgnoreCase(t).orElseGet(() -> {
+                            Equipment newEq = new Equipment();
+                            newEq.setName(t);
+                            return equipmentJpaRepository.save(newEq);
+                        });
+                        re.setEquipment(eq);
+                        return re;
+                    }).collect(Collectors.toSet());
+            recipe.setRecipeEquipments(tools);
+        }
+
         Recipe savedEntity = jpaRepository.save(recipe);
         return mapToModel(savedEntity);
+    }
+
+    @Override
+    public void deleteRecipe(Long id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsByTitle(String title) {
+        return jpaRepository.existsByTitleIgnoreCase(title);
     }
 
     private List<RecipeModel> mapToModelList(List<Recipe> entities) {
@@ -132,6 +162,10 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .map(t -> t.getDietaryTag().getName())
                 .collect(Collectors.toList());
 
+        List<String> tools = entity.getRecipeEquipments() == null ? List.of() : entity.getRecipeEquipments().stream()
+                .map(re -> re.getEquipment().getName())
+                .collect(Collectors.toList());
+
         return RecipeModel.builder()
                 .id(entity.getId())
                 .creatorId(entity.getCreator() != null ? entity.getCreator().getId() : null)
@@ -147,6 +181,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .dietaryTags(dietaryTags)
                 .steps(stepModels)
                 .ingredients(ingredientModels)
+                .tools(tools)
                 .build();
     }
 }

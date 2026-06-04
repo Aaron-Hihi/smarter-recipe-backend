@@ -31,4 +31,12 @@ public class RecipeService {
     public List<RecipeModel> getDietRecommendations(String tagName) {
         return recipeRepository.getPublishedRecipesByTag(tagName);
     }
+
+    public void deleteRecipe(Long id) {
+        recipeRepository.deleteRecipe(id);
+    }
+
+    public boolean existsByTitle(String title) {
+        return recipeRepository.existsByTitle(title);
+    }
 }

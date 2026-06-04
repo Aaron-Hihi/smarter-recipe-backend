@@ -25,6 +25,7 @@ public class RecipeModel {
     private List<String> dietaryTags;
     private List<StepModel> steps;
     private List<IngredientModel> ingredients;
+    private List<String> tools;
 
     @Getter @Setter @Builder
     public static class StepModel {

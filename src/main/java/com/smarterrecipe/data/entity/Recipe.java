@@ -88,4 +88,7 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe")
     private Set<RecipePantry> recipePantries = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RecipeEquipment> recipeEquipments = new LinkedHashSet<>();
 }

@@ -12,6 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +80,43 @@ public class UserHandler {
                 .createdAt(user.getCreatedAt())
                 .build();
                 
+        return toResponse(userService.updateUser(updated));
+    }
+
+    @Transactional
+    public UserResponse updateProfilePicture(String username, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
+        }
+
+        long maxSizeBytes = 5 * 1024 * 1024; // 5MB
+        if (file.getSize() > maxSizeBytes) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File size must be under 5MB");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only JPG and PNG formats are supported");
+        }
+
+        // Normally we'd upload to S3 or a local dir. We'll just generate a mock URL.
+        String mockUrl = "https://smarterrecipe-images.s3.amazonaws.com/profiles/" + username + "-" + file.getOriginalFilename();
+
+        com.smarterrecipe.domain.model.UserModel user = userService.getByUsername(username);
+        com.smarterrecipe.domain.model.UserModel updated = com.smarterrecipe.domain.model.UserModel.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .bio(user.getBio())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .profilePictureUrl(mockUrl)
+                .createdAt(user.getCreatedAt())
+                .isBanned(user.getIsBanned())
+                .isVerified(user.getIsVerified())
+                .build();
+
         return toResponse(userService.updateUser(updated));
     }
 

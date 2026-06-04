@@ -22,4 +22,8 @@ public interface RecipeJpaRepository extends JpaRepository<Recipe, Long> {
     @EntityGraph(value = "Recipe.deepFetch")
     @Query("SELECT r FROM Recipe r JOIN r.recipeDietaryTags rdt JOIN rdt.dietaryTag dt WHERE dt.name = :tagName AND r.status = :status")
     List<Recipe> findApprovedRecipesByDietaryTag(@Param("tagName") String tagName, @Param("status") RecipeStatus status);
+
+    boolean existsByTitleIgnoreCase(String title);
+    boolean existsByTitleIgnoreCaseAndIdNot(String title, Long id);
+    List<Recipe> findByCreatorId(Long creatorId);
 }

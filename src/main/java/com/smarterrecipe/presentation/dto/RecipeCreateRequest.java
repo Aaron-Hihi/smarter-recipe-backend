@@ -14,4 +14,6 @@ public class RecipeCreateRequest {
 
     @NotEmpty
     private List<String> ingredients;
+
+    private List<String> tools;
 }
