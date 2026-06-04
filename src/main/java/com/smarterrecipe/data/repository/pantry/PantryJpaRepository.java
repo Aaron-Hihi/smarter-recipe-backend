@@ -1,13 +1,10 @@
-package com.smarterrecipe.data.repository;
+package com.smarterrecipe.data.repository.pantry;
 
 import com.smarterrecipe.data.entity.Pantry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
-public interface PantryRepository extends JpaRepository<Pantry, Long> {
-    Optional<Pantry> findByNameIgnoreCase(String name);
+public interface PantryJpaRepository extends JpaRepository<Pantry, Long> {
     boolean existsByNameIgnoreCase(String name);
 }

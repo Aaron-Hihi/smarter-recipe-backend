@@ -1,6 +1,6 @@
 package com.smarterrecipe.presentation.middleware;
 
-import com.smarterrecipe.domain.service.JwtService;
+import com.smarterrecipe.application.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,11 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-
-        System.out.println("=== TOKEN DITERIMA DARI POSTMAN ===");
-        System.out.println("[" + jwt + "]");
-        System.out.println("===================================");
-
         username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

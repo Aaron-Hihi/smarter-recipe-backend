@@ -1,27 +1,34 @@
 package com.smarterrecipe.domain.service;
 
-import com.smarterrecipe.data.entity.Recipe;
-import com.smarterrecipe.data.repository.RecipeRepository;
-import com.smarterrecipe.domain.model.enums.RecipeStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.smarterrecipe.domain.model.RecipeModel;
+import com.smarterrecipe.domain.repository.RecipeRepository;
 import java.util.List;
 
-@Service
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
 
-    @Autowired
     public RecipeService(RecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
     }
 
-    public List<Recipe> searchRecipes(String keyword) {
-        return recipeRepository.findByTitleContainingIgnoreCaseAndStatus(keyword, RecipeStatus.PUBLISHED);
+    public RecipeModel createRecipe(RecipeModel newRecipe) {
+        return recipeRepository.saveRecipe(newRecipe);
     }
 
-    public List<Recipe> getDietRecommendations(String tagName) {
-        return recipeRepository.findApprovedRecipesByDietaryTag(tagName);
+    public List<RecipeModel> getAllRecipes() {
+        return recipeRepository.getAllPublishedRecipes();
+    }
+
+    public RecipeModel getRecipeById(Long id) {
+        return recipeRepository.getRecipeById(id);
+    }
+
+    public List<RecipeModel> searchRecipes(String keyword) {
+        return recipeRepository.searchPublishedRecipes(keyword);
+    }
+
+    public List<RecipeModel> getDietRecommendations(String tagName) {
+        return recipeRepository.getPublishedRecipesByTag(tagName);
     }
 }

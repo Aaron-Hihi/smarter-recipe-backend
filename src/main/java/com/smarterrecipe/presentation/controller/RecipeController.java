@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
+import com.smarterrecipe.presentation.dto.ApiResponse;
+
 @RestController
-@RequestMapping("/api/v1/recipes")
+@RequestMapping("/api/recipes")
 @RequiredArgsConstructor
 public class RecipeController {
 
@@ -20,17 +23,32 @@ public class RecipeController {
     private final RecipeQueryHandler recipeQueryHandler;
 
     @PostMapping
-    public ResponseEntity<String> createRecipe(@Valid @RequestBody RecipeCreateRequest request) {
-        return ResponseEntity.ok(recipeCommandHandler.createRecipe(request));
+    public ResponseEntity<ApiResponse<RecipeResponse>> createRecipe(@Valid @RequestBody RecipeCreateRequest request, Principal principal) {
+        com.smarterrecipe.domain.model.RecipeModel created = recipeCommandHandler.createRecipe(request.getTitle(), request.getIngredients(), principal.getName());
+        return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getRecipeById(created.getId())));
     }
 
     @GetMapping
-    public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
-        return ResponseEntity.ok(recipeQueryHandler.getAllRecipes());
+    public ResponseEntity<ApiResponse<List<RecipeResponse>>> getAllRecipes() {
+        return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getAllRecipes()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecipeResponse> getRecipeById(@PathVariable Long id) {
-        return ResponseEntity.ok(recipeQueryHandler.getRecipeById(id));
+    public ResponseEntity<ApiResponse<RecipeResponse>> getRecipeById(@PathVariable Long id) {
+        return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getRecipeById(id)));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<RecipeResponse>>> searchRecipes(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String dietaryTag) {
+
+        if (title != null && !title.isBlank()) {
+            return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.searchRecipesByTitle(title)));
+        } else if (dietaryTag != null && !dietaryTag.isBlank()) {
+            return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.searchRecipesByDietaryTag(dietaryTag)));
+        }
+
+        return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getAllRecipes()));
     }
 }

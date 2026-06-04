@@ -1,6 +1,7 @@
 package com.smarterrecipe.common.config;
 
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.domain.model.UserModel;
+import com.smarterrecipe.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,11 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            UserModel userModel = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            return new UserPrincipal(userModel);
+        };
     }
 
     @Bean

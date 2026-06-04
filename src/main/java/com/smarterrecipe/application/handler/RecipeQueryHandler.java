@@ -1,11 +1,10 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.Recipe;
-import com.smarterrecipe.data.repository.RecipeRepository;
+import com.smarterrecipe.domain.model.RecipeModel;
+import com.smarterrecipe.domain.service.RecipeService;
 import com.smarterrecipe.presentation.dto.RecipeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,50 +13,63 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecipeQueryHandler {
 
-    private final RecipeRepository recipeRepository;
+    private final RecipeService recipeService;
 
-    @Transactional(readOnly = true)
     public List<RecipeResponse> getAllRecipes() {
-        return recipeRepository.findAll().stream()
+        return mapToResponseList(recipeService.getAllRecipes());
+    }
+
+    public RecipeResponse getRecipeById(Long id) {
+        return mapToResponse(recipeService.getRecipeById(id));
+    }
+
+    public List<RecipeResponse> searchRecipesByTitle(String title) {
+        return mapToResponseList(recipeService.searchRecipes(title));
+    }
+
+    public List<RecipeResponse> searchRecipesByDietaryTag(String tagName) {
+        return mapToResponseList(recipeService.getDietRecommendations(tagName));
+    }
+
+    private List<RecipeResponse> mapToResponseList(List<RecipeModel> models) {
+        return models.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public RecipeResponse getRecipeById(Long id) {
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Recipe with ID " + id + " not found"));
-        return mapToResponse(recipe);
+    private RecipeResponse mapToResponse(RecipeModel model) {
+        return RecipeResponse.builder()
+                .id(model.getId())
+                .title(model.getTitle())
+                .authorName(model.getCreatorId() != null ? "User " + model.getCreatorId() : "Unknown") // Placeholder since we only have creatorId in RecipeModel now, we'll fix later if needed
+                .authorId(model.getCreatorId())
+                .cookTime(model.getPreparationTime() != null ? model.getPreparationTime() + " mins" : "N/A")
+                .servings(model.getServingSize())
+                .averageRating(model.getAverageRating() != null ? model.getAverageRating() : 0.0)
+                .imageUrl(model.getThumbnailUrl())
+                .isPublished("PUBLISHED".equals(model.getStatus() != null ? model.getStatus().name() : ""))
+                .dietaryTags(model.getDietaryTags() != null ? model.getDietaryTags() : List.of())
+                .steps(mapSteps(model.getSteps()))
+                .ingredients(mapIngredients(model.getIngredients()))
+                .build();
     }
 
-    private RecipeResponse mapToResponse(Recipe recipe) {
-        List<RecipeResponse.StepResponse> steps = recipe.getRecipeSteps() != null ?
-                recipe.getRecipeSteps().stream()
-                        .map(step -> RecipeResponse.StepResponse.builder()
-                                .stepNumber(step.getStepNumber())
-                                .instruction(step.getInstruction())
-                                .build())
-                        .collect(Collectors.toList()) : List.of();
+    private List<String> mapSteps(List<RecipeModel.StepModel> steps) {
+        if (steps == null) return List.of();
+        return steps.stream()
+                .map(RecipeModel.StepModel::getInstruction)
+                .collect(Collectors.toList());
+    }
 
-        List<RecipeResponse.IngredientResponse> ingredients = recipe.getRecipeIngredients() != null ?
-                recipe.getRecipeIngredients().stream()
-                        .map(ing -> RecipeResponse.IngredientResponse.builder()
-                                .ingredientName(ing.getIngredient().getName())
-                                .amount(ing.getAmount())
-                                .unit(ing.getUnit())
-                                .build())
-                        .collect(Collectors.toList()) : List.of();
-
-        return RecipeResponse.builder()
-                .id(recipe.getId())
-                .title(recipe.getTitle())
-                .description(recipe.getDescription())
-                .creatorName(recipe.getCreator().getUsername())
-                .preparationTime(recipe.getPreparationTime())
-                .servingSize(recipe.getServingSize())
-                .status(recipe.getStatus().name())
-                .steps(steps)
-                .ingredients(ingredients)
-                .build();
+    private List<RecipeResponse.IngredientResponse> mapIngredients(List<RecipeModel.IngredientModel> ingredients) {
+        if (ingredients == null) return List.of();
+        return ingredients.stream()
+                .map(ing -> RecipeResponse.IngredientResponse.builder()
+                        .id(ing.getIngredientId())
+                        .name(ing.getIngredientName())
+                        .quantity(ing.getAmount() + " " + ing.getUnit())
+                        .isMissing(false)
+                        .build())
+                .collect(Collectors.toList());
     }
 }

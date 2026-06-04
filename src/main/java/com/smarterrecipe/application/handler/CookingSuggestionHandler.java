@@ -1,9 +1,8 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.*;
-import com.smarterrecipe.data.repository.RecipeRepository;
 import com.smarterrecipe.domain.engine.MatchingEngine;
-import com.smarterrecipe.domain.model.enums.RecipeStatus;
+import com.smarterrecipe.domain.model.RecipeModel;
+import com.smarterrecipe.domain.service.RecipeService;
 import com.smarterrecipe.presentation.dto.CookingSuggestionRequest;
 import com.smarterrecipe.presentation.dto.SuggestionResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +18,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CookingSuggestionHandler {
 
-    private final RecipeRepository recipeRepository;
+    private final RecipeService recipeService;
     private final MatchingEngine matchingEngine;
 
     @Transactional(readOnly = true)
     public List<SuggestionResponse> getSuggestions(CookingSuggestionRequest request) {
-        List<Recipe> recipes = recipeRepository.findByStatus(RecipeStatus.PUBLISHED);
+        List<RecipeModel> recipes = recipeService.getAllRecipes();
         Set<Long> ownedIds = Set.copyOf(request.getOwnedIngredientIds());
 
         return recipes.stream()
@@ -33,7 +32,7 @@ public class CookingSuggestionHandler {
                 .collect(Collectors.toList());
     }
 
-    private SuggestionResponse evaluateRecipe(Recipe recipe, Set<Long> ownedIds) {
+    private SuggestionResponse evaluateRecipe(RecipeModel recipe, Set<Long> ownedIds) {
         List<Long> requiredIds = extractRequiredIngredients(recipe);
         List<Long> effectiveOwnedIds = resolveSubstitutions(recipe, ownedIds);
 
@@ -42,36 +41,32 @@ public class CookingSuggestionHandler {
         return buildResponse(recipe, result);
     }
 
-    private List<Long> extractRequiredIngredients(Recipe recipe) {
-        return recipe.getRecipeIngredients().stream()
-                .map(ri -> ri.getIngredient().getId())
+    private List<Long> extractRequiredIngredients(RecipeModel recipe) {
+        return recipe.getIngredients().stream()
+                .map(RecipeModel.IngredientModel::getIngredientId)
                 .collect(Collectors.toList());
     }
 
-    private List<Long> resolveSubstitutions(Recipe recipe, Set<Long> ownedIds) {
+    private List<Long> resolveSubstitutions(RecipeModel recipe, Set<Long> ownedIds) {
         List<Long> effectiveOwned = new ArrayList<>(ownedIds);
 
-        for (RecipeIngredient ri : recipe.getRecipeIngredients()) {
-            if (!ownedIds.contains(ri.getIngredient().getId()) && hasValidSubstitute(ri, ownedIds)) {
-                effectiveOwned.add(ri.getIngredient().getId());
+        for (RecipeModel.IngredientModel ri : recipe.getIngredients()) {
+            if (!ownedIds.contains(ri.getIngredientId()) && hasValidSubstitute(ri, ownedIds)) {
+                effectiveOwned.add(ri.getIngredientId());
             }
         }
         return effectiveOwned;
     }
 
-    private boolean hasValidSubstitute(RecipeIngredient ri, Set<Long> ownedIds) {
-        if (ri.getSubstitutions() == null) {
-            return false;
-        }
-        return ri.getSubstitutions().stream()
-                .anyMatch(sub -> ownedIds.contains(sub.getSubstituteIngredient().getId()));
+    private boolean hasValidSubstitute(RecipeModel.IngredientModel ri, Set<Long> ownedIds) {
+        if (ri.getSubstituteIngredientIds() == null) return false;
+        return ri.getSubstituteIngredientIds().stream().anyMatch(ownedIds::contains);
     }
 
-    private SuggestionResponse buildResponse(Recipe recipe, MatchingEngine.MatchResult result) {
+    private SuggestionResponse buildResponse(RecipeModel recipe, MatchingEngine.MatchResult result) {
         return SuggestionResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
-                .thumbnailUrl(recipe.getThumbnailUrl())
                 .preparationTime(recipe.getPreparationTime())
                 .matchScore(result.matchScore())
                 .missingIngredientIds(result.missingIngredientIds())

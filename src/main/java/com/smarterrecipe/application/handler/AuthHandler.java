@@ -1,12 +1,9 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.User;
-import com.smarterrecipe.data.repository.UserRepository;
-import com.smarterrecipe.domain.model.enums.Role;
-import com.smarterrecipe.domain.service.JwtService;
-import com.smarterrecipe.presentation.dto.auth.AuthResponse;
-import com.smarterrecipe.presentation.dto.auth.LoginRequest;
-import com.smarterrecipe.presentation.dto.auth.RegisterRequest;
+import com.smarterrecipe.domain.model.UserModel;
+import com.smarterrecipe.application.security.JwtService;
+import com.smarterrecipe.domain.service.UserService;
+import com.smarterrecipe.application.dto.AuthResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,36 +14,32 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthHandler {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()) || userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Username atau Email sudah terdaftar");
-        }
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.HOME_COOK);
-
-        userRepository.save(user);
-
-        String jwtToken = jwtService.generateToken(user.getUsername());
-        return AuthResponse.builder().token(jwtToken).build();
-    }
-
-    public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+    public AuthResult register(String name, String email, String password) {
+        UserModel user = userService.registerUser(
+                name,
+                email,
+                passwordEncoder.encode(password)
         );
 
-        User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        String jwtToken = jwtService.generateToken(user.getUsername());
+        return AuthResult.builder().token(jwtToken).user(user).build();
+    }
+
+    public AuthResult login(String email, String password) {
+        // Find user by email first to get username for auth
+        UserModel user = userService.getByEmail(email);
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), password)
+        );
+
         String jwtToken = jwtService.generateToken(user.getUsername());
 
-        return AuthResponse.builder().token(jwtToken).build();
+        return AuthResult.builder().token(jwtToken).user(user).build();
     }
 }

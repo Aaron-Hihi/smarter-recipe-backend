@@ -1,8 +1,9 @@
-package com.smarterrecipe.domain.service;
+package com.smarterrecipe.application.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,8 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "SmarterRecipeSecretKeyYangSangatPanjangDanAmanSekaliSmarterRecipeSecretKey";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();

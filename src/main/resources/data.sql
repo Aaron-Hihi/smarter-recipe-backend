@@ -1,5 +1,5 @@
 INSERT INTO users (id, username, email, password, role, profile_picture_url, created_at)
-VALUES (1, 'reza_reynaldi', 'reza@mail.com', 'hashed_password_1', 'HOME_COOK', 'http://example.com/reza.jpg', NOW());
+VALUES (1, 'reza_reynaldi', 'reza@mail.com', '$2a$10$dXJ3S7A64b.M6B2bW6/KDeuxDOPGToVlpx.9mpxb4AiuWz81C0G6K', 'HOME_COOK', 'http://example.com/reza.jpg', NOW());
 INSERT INTO users (id, username, email, password, role, profile_picture_url, created_at)
 VALUES (2, 'chef_arnold', 'arnold@smarterrecipe.com', 'hashed_password_2', 'RECIPE_CREATOR', 'http://example.com/arnold.jpg', NOW());
 INSERT INTO users (id, username, email, password, role, profile_picture_url, created_at)

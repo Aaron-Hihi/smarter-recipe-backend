@@ -1,41 +1,34 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.Pantry;
-import com.smarterrecipe.data.repository.PantryRepository;
-import com.smarterrecipe.presentation.dto.pantry.PantryRequest;
-import com.smarterrecipe.presentation.dto.pantry.PantryResponse;
+import com.smarterrecipe.domain.model.PantryModel;
+import com.smarterrecipe.domain.service.PantryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PantryHandler {
+    private final PantryService pantryService;
 
-    private final PantryRepository pantryRepository;
+    public PantryModel createPantry(String name, String quantity, String category) {
+        // We serialize quantity and category into description for MVP
+        String description = (category != null ? category : "") + "|" + (quantity != null ? quantity : "");
 
-    public PantryResponse createPantry(PantryRequest request) {
-        if (pantryRepository.existsByNameIgnoreCase(request.getName())) {
-            throw new IllegalArgumentException("Pantry already exists");
-        }
+        PantryModel model = PantryModel.builder()
+                .name(name)
+                .description(description)
+                .build();
 
-        Pantry pantry = new Pantry();
-        pantry.setName(request.getName());
-        pantry.setDescription(request.getDescription());
-        pantry = pantryRepository.save(pantry);
-
-        return new PantryResponse(pantry.getId(), pantry.getName(), pantry.getDescription());
+        return pantryService.create(model);
     }
 
-    public List<PantryResponse> getAllPantries() {
-        return pantryRepository.findAll().stream()
-                .map(pantry -> new PantryResponse(
-                        pantry.getId(),
-                        pantry.getName(),
-                        pantry.getDescription()
-                ))
-                .collect(Collectors.toList());
+    public List<PantryModel> getAllPantries() {
+        return pantryService.getAll();
+    }
+
+    public void deletePantry(Long id) {
+        pantryService.delete(id);
     }
 }

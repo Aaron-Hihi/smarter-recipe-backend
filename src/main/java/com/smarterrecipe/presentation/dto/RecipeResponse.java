@@ -11,26 +11,24 @@ import java.util.List;
 public class RecipeResponse {
     private Long id;
     private String title;
-    private String description;
-    private String creatorName;
-    private Integer preparationTime;
-    private Integer servingSize;
-    private String status;
-    private List<StepResponse> steps;
+    private String authorName;
+    private Long authorId;
+    private String cookTime;
+    private Integer servings;
+    private Double averageRating;
+    private String imageUrl;
+    private Integer matchScore;
+    private Boolean isPublished;
+    private List<String> dietaryTags;
     private List<IngredientResponse> ingredients;
-
-    @Getter @Setter
-    @Builder
-    public static class StepResponse {
-        private Integer stepNumber;
-        private String instruction;
-    }
+    private List<String> steps;
 
     @Getter @Setter
     @Builder
     public static class IngredientResponse {
-        private String ingredientName;
-        private Double amount;
-        private String unit;
+        private Long id;
+        private String name;
+        private String quantity;
+        private Boolean isMissing;
     }
 }

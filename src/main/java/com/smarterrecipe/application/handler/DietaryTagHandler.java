@@ -1,7 +1,7 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.DietaryTag;
-import com.smarterrecipe.data.repository.DietaryTagRepository;
+import com.smarterrecipe.domain.model.DietaryTagModel;
+import com.smarterrecipe.domain.service.DietaryTagService;
 import com.smarterrecipe.presentation.dto.dietarytag.DietaryTagRequest;
 import com.smarterrecipe.presentation.dto.dietarytag.DietaryTagResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,28 +14,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DietaryTagHandler {
 
-    private final DietaryTagRepository dietaryTagRepository;
+    private final DietaryTagService dietaryTagService;
 
     public DietaryTagResponse createDietaryTag(DietaryTagRequest request) {
-        if (dietaryTagRepository.existsByNameIgnoreCase(request.getName())) {
-            throw new IllegalArgumentException("Dietary Tag already exists");
-        }
+        DietaryTagModel model = DietaryTagModel.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .build();
 
-        DietaryTag dietaryTag = new DietaryTag();
-        dietaryTag.setName(request.getName());
-        dietaryTag.setDescription(request.getDescription());
-        dietaryTag = dietaryTagRepository.save(dietaryTag);
-
-        return new DietaryTagResponse(dietaryTag.getId(), dietaryTag.getName(), dietaryTag.getDescription());
+        DietaryTagModel saved = dietaryTagService.create(model);
+        return new DietaryTagResponse(saved.getId(), saved.getName(), saved.getDescription());
     }
 
     public List<DietaryTagResponse> getAllDietaryTags() {
-        return dietaryTagRepository.findAll().stream()
-                .map(tag -> new DietaryTagResponse(
-                        tag.getId(),
-                        tag.getName(),
-                        tag.getDescription()
-                ))
+        return dietaryTagService.getAll().stream()
+                .map(tag -> new DietaryTagResponse(tag.getId(), tag.getName(), tag.getDescription()))
                 .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 package com.smarterrecipe.application.handler;
 
-import com.smarterrecipe.data.entity.Ingredient;
-import com.smarterrecipe.data.repository.IngredientRepository;
+import com.smarterrecipe.domain.model.IngredientModel;
+import com.smarterrecipe.domain.service.IngredientService;
 import com.smarterrecipe.presentation.dto.ingredient.IngredientRequest;
 import com.smarterrecipe.presentation.dto.ingredient.IngredientResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,26 +14,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class IngredientHandler {
 
-    private final IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
 
     public IngredientResponse createIngredient(IngredientRequest request) {
-        if (ingredientRepository.existsByNameIgnoreCase(request.getName())) {
-            throw new IllegalArgumentException("Ingredient sudah ada");
-        }
+        IngredientModel model = IngredientModel.builder()
+                .name(request.getName())
+                .build();
 
-        Ingredient ingredient = new Ingredient();
-        ingredient.setName(request.getName());
-        ingredient = ingredientRepository.save(ingredient);
-
-        return new IngredientResponse(ingredient.getId(), ingredient.getName());
+        IngredientModel saved = ingredientService.create(model);
+        return new IngredientResponse(saved.getId(), saved.getName());
     }
 
     public List<IngredientResponse> getAllIngredients() {
-        return ingredientRepository.findAll().stream()
-                .map(ingredient -> new IngredientResponse(
-                        ingredient.getId(),
-                        ingredient.getName()
-                ))
+        return ingredientService.getAll().stream()
+                .map(ing -> new IngredientResponse(ing.getId(), ing.getName()))
                 .collect(Collectors.toList());
     }
 }

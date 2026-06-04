@@ -9,5 +9,6 @@ public class PantryRequest {
     @NotBlank
     private String name;
 
-    private String description;
+    private String quantity;
+    private String category;
 }

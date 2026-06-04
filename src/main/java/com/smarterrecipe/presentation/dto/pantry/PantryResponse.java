@@ -9,5 +9,6 @@ import lombok.Setter;
 public class PantryResponse {
     private Long id;
     private String name;
-    private String description;
+    private String quantity;
+    private String category;
 }

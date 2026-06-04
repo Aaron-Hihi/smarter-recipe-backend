@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smarterrecipe.application.dto.AuthResult;
+
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -21,11 +23,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authHandler.register(request));
+        AuthResult result = authHandler.register(request.getName(), request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(result.getUser()).build());
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authHandler.login(request));
+        AuthResult result = authHandler.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(result.getUser()).build());
     }
 }
