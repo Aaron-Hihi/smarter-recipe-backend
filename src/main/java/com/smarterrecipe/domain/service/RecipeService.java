@@ -16,11 +16,11 @@ public class RecipeService {
         this.recipeRepository = recipeRepository;
     }
 
-    public List<Recipe> searchRecipes(String keyword) {
-        return recipeRepository.findByTitleContainingIgnoreCaseAndStatus(keyword, "APPROVED");
-    }
+    //public List<Recipe> searchRecipes(String keyword) {
+      //  return recipeRepository.findByTitleContainingIgnoreCaseAndStatus(keyword, "APPROVED");
+    //}
 
-    public List<Recipe> getDietRecommendations(String tagName) {
-        return recipeRepository.findApprovedRecipesByDietaryTag(tagName);
-    }
+    // public List<Recipe> getDietRecommendations(String tagName) {
+       //  return recipeRepository.findApprovedRecipesByDietaryTag(tagName);
+    //}
 }
