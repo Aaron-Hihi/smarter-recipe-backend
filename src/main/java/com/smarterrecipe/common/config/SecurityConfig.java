@@ -27,8 +27,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/recipes/**", "/api/recipes/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/recipes/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/followers").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/following").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/{userId}/follow-counts").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
         )
