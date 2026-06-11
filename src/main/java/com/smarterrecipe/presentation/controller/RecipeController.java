@@ -15,7 +15,7 @@ import java.util.List;
 import com.smarterrecipe.presentation.dto.ApiResponse;
 
 @RestController
-@RequestMapping("/api/recipes")
+@RequestMapping("/api/v1/recipes")
 @RequiredArgsConstructor
 public class RecipeController {
 
@@ -31,6 +31,11 @@ public class RecipeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<RecipeResponse>>> getAllRecipes() {
         return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getAllRecipes()));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<RecipeResponse>>> getMyRecipes() {
+        return ResponseEntity.ok(new ApiResponse<>(recipeQueryHandler.getMyRecipes()));
     }
 
     @GetMapping("/{id}")

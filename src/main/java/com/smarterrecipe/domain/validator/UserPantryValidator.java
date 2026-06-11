@@ -1,8 +1,8 @@
 package com.smarterrecipe.domain.validator;
 
-import com.smarterrecipe.data.repository.PantryRepository;
-import com.smarterrecipe.data.repository.UserPantryRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.pantry.PantryJpaRepository;
+import com.smarterrecipe.data.repository.pantry.UserPantryJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserPantryValidator {
 
-    private final UserRepository userRepository;
-    private final PantryRepository pantryRepository;
-    private final UserPantryRepository userPantryRepository;
+    private final UserJpaRepository userRepository;
+    private final com.smarterrecipe.data.repository.ingredient.IngredientJpaRepository ingredientRepository;
+    private final UserPantryJpaRepository userPantryRepository;
 
     public void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
@@ -20,21 +20,21 @@ public class UserPantryValidator {
         }
     }
 
-    public void validatePantryExists(Long pantryId) {
-        if (!pantryRepository.existsById(pantryId)) {
-            throw new IllegalArgumentException("Pantry tidak ditemukan");
+    public void validateIngredientExists(Long ingredientId) {
+        if (!ingredientRepository.existsById(ingredientId)) {
+            throw new IllegalArgumentException("Ingredient tidak ditemukan");
         }
     }
 
-    public void validateNotDuplicate(Long userId, Long pantryId) {
-        if (userPantryRepository.existsByUserIdAndPantryId(userId, pantryId)) {
-            throw new IllegalArgumentException("User sudah memiliki pantry ini");
+    public void validateNotDuplicate(Long userId, Long ingredientId) {
+        if (userPantryRepository.existsByUserIdAndIngredientId(userId, ingredientId)) {
+            throw new IllegalArgumentException("User sudah memiliki ingredient ini di pantry");
         }
     }
 
-    public void validateUserPantryExists(Long userId, Long pantryId) {
-        if (!userPantryRepository.existsByUserIdAndPantryId(userId, pantryId)) {
-            throw new IllegalArgumentException("Pantry tidak ditemukan pada user ini");
+    public void validateUserPantryExists(Long userId, Long ingredientId) {
+        if (!userPantryRepository.existsByUserIdAndIngredientId(userId, ingredientId)) {
+            throw new IllegalArgumentException("Ingredient tidak ditemukan pada pantry user ini");
         }
     }
 }

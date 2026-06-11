@@ -2,8 +2,8 @@ package com.smarterrecipe.domain.service;
 
 import com.smarterrecipe.data.entity.Notification;
 import com.smarterrecipe.data.entity.User;
-import com.smarterrecipe.data.repository.NotificationRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.notification.NotificationJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.validator.NotificationValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
+    private final NotificationJpaRepository notificationRepository;
+    private final UserJpaRepository userRepository;
     private final NotificationValidator notificationValidator;
 
     @Transactional

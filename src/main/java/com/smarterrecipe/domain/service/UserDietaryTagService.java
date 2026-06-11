@@ -3,9 +3,9 @@ package com.smarterrecipe.domain.service;
 import com.smarterrecipe.data.entity.DietaryTag;
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserDietaryTag;
-import com.smarterrecipe.data.repository.DietaryTagRepository;
-import com.smarterrecipe.data.repository.UserDietaryTagRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.dietarytag.DietaryTagJpaRepository;
+import com.smarterrecipe.data.repository.user.UserDietaryTagJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.validator.UserDietaryTagValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDietaryTagService {
 
-    private final UserDietaryTagRepository userDietaryTagRepository;
-    private final UserRepository userRepository;
-    private final DietaryTagRepository dietaryTagRepository;
+    private final UserDietaryTagJpaRepository userDietaryTagRepository;
+    private final UserJpaRepository userRepository;
+    private final DietaryTagJpaRepository dietaryTagRepository;
     private final UserDietaryTagValidator userDietaryTagValidator;
 
     public List<UserDietaryTag> getUserDietaryTags(Long userId) {

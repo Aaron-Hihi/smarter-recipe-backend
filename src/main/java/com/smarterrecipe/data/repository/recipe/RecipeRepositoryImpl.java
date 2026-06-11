@@ -134,6 +134,11 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         return jpaRepository.existsByTitleIgnoreCase(title);
     }
 
+    @Override
+    public List<RecipeModel> getRecipesByCreatorId(Long creatorId) {
+        return mapToModelList(jpaRepository.findByCreatorId(creatorId));
+    }
+
     private List<RecipeModel> mapToModelList(List<Recipe> entities) {
         return entities.stream().map(this::mapToModel).collect(Collectors.toList());
     }
@@ -169,6 +174,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         return RecipeModel.builder()
                 .id(entity.getId())
                 .creatorId(entity.getCreator() != null ? entity.getCreator().getId() : null)
+                .creatorUsername(entity.getCreator() != null ? entity.getCreator().getUsername() : null)
                 .title(entity.getTitle())
                 .thumbnailUrl(entity.getThumbnailUrl())
                 .description(entity.getDescription())

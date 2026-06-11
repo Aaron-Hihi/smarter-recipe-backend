@@ -17,6 +17,12 @@ public class UserPantry {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pantry_id", nullable = false)
-    private Pantry pantry;
+    @JoinColumn(name = "ingredient_id", nullable = false)
+    private Ingredient ingredient;
+
+    @Column(nullable = false)
+    private Double quantity = 1.0;
+
+    @Column(nullable = false)
+    private String unit = "pcs";
 }

@@ -18,6 +18,7 @@ public class UserResponse {
     private String profileImageUrl;
     private Integer followersCount;
     private Integer followingCount;
+    private Integer recipesCount;
     private DietaryPreferencesResponse dietaryPreferences;
 
     @Getter @Setter

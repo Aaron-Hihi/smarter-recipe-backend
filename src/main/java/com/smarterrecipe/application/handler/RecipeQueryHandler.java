@@ -4,6 +4,7 @@ import com.smarterrecipe.domain.model.RecipeModel;
 import com.smarterrecipe.domain.service.RecipeService;
 import com.smarterrecipe.presentation.dto.RecipeResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +15,17 @@ import java.util.stream.Collectors;
 public class RecipeQueryHandler {
 
     private final RecipeService recipeService;
+    private final com.smarterrecipe.data.repository.user.UserJpaRepository userRepository;
 
     public List<RecipeResponse> getAllRecipes() {
         return mapToResponseList(recipeService.getAllRecipes());
+    }
+
+    public List<RecipeResponse> getMyRecipes() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        com.smarterrecipe.data.entity.User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return mapToResponseList(recipeService.getRecipesByCreatorId(user.getId()));
     }
 
     public RecipeResponse getRecipeById(Long id) {
@@ -41,7 +50,7 @@ public class RecipeQueryHandler {
         return RecipeResponse.builder()
                 .id(model.getId())
                 .title(model.getTitle())
-                .authorName(model.getCreatorId() != null ? "User " + model.getCreatorId() : "Unknown") // Placeholder since we only have creatorId in RecipeModel now, we'll fix later if needed
+                .authorName(model.getCreatorUsername() != null ? model.getCreatorUsername() : "Unknown")
                 .authorId(model.getCreatorId())
                 .cookTime(model.getPreparationTime() != null ? model.getPreparationTime() + " mins" : "N/A")
                 .servings(model.getServingSize())

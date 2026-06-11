@@ -1,8 +1,8 @@
 package com.smarterrecipe.domain.validator;
 
-import com.smarterrecipe.data.repository.DietaryTagRepository;
-import com.smarterrecipe.data.repository.UserDietaryTagRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.dietarytag.DietaryTagJpaRepository;
+import com.smarterrecipe.data.repository.user.UserDietaryTagJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserDietaryTagValidator {
 
-    private final UserRepository userRepository;
-    private final DietaryTagRepository dietaryTagRepository;
-    private final UserDietaryTagRepository userDietaryTagRepository;
+    private final UserJpaRepository userRepository;
+    private final DietaryTagJpaRepository dietaryTagRepository;
+    private final UserDietaryTagJpaRepository userDietaryTagRepository;
 
     public void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {

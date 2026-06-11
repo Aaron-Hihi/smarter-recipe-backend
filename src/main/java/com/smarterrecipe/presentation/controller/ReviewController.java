@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/recipes/{recipeId}/reviews")
+@RequestMapping("/api/v1/recipes/{recipeId}/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 

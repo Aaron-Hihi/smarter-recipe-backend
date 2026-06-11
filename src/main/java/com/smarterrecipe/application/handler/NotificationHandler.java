@@ -3,8 +3,7 @@ package com.smarterrecipe.application.handler;
 import com.smarterrecipe.data.entity.Notification;
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.repository.notification.NotificationJpaRepository;
-import com.smarterrecipe.domain.model.UserModel;
-import com.smarterrecipe.domain.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.service.NotificationService;
 import com.smarterrecipe.presentation.dto.notification.NotificationResponse;
 import com.smarterrecipe.presentation.dto.notification.UnreadCountResponse;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 public class NotificationHandler {
 
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
     private final NotificationJpaRepository notificationJpaRepository;
 
     public List<NotificationResponse> getMyNotifications() {
@@ -57,7 +56,7 @@ public class NotificationHandler {
 
     private Long getAuthenticatedUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserModel user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return user.getId();
     }

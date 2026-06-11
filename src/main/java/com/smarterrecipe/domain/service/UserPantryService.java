@@ -1,11 +1,11 @@
 package com.smarterrecipe.domain.service;
 
-import com.smarterrecipe.data.entity.Pantry;
+import com.smarterrecipe.data.entity.Ingredient;
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserPantry;
-import com.smarterrecipe.data.repository.PantryRepository;
-import com.smarterrecipe.data.repository.UserPantryRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.ingredient.IngredientJpaRepository;
+import com.smarterrecipe.data.repository.pantry.UserPantryJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.validator.UserPantryValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserPantryService {
 
-    private final UserPantryRepository userPantryRepository;
-    private final UserRepository userRepository;
-    private final PantryRepository pantryRepository;
+    private final UserPantryJpaRepository userPantryRepository;
+    private final UserJpaRepository userRepository;
+    private final IngredientJpaRepository ingredientRepository;
     private final UserPantryValidator userPantryValidator;
 
     public List<UserPantry> getUserPantries(Long userId) {
@@ -28,27 +28,31 @@ public class UserPantryService {
     }
 
     @Transactional
-    public UserPantry addPantryToUser(Long userId, Long pantryId) {
+    public UserPantry addIngredientToUserPantry(Long userId, Long ingredientId, Double quantity, String unit) {
         userPantryValidator.validateUserExists(userId);
-        userPantryValidator.validatePantryExists(pantryId);
-        userPantryValidator.validateNotDuplicate(userId, pantryId);
+        userPantryValidator.validateIngredientExists(ingredientId);
+
+        // If it exists, we could either update or just throw error as before.
+        userPantryValidator.validateNotDuplicate(userId, ingredientId);
 
         User user = userRepository.findById(userId).orElseThrow();
-        Pantry pantry = pantryRepository.findById(pantryId).orElseThrow();
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow();
 
         UserPantry userPantry = new UserPantry();
         userPantry.setUser(user);
-        userPantry.setPantry(pantry);
+        userPantry.setIngredient(ingredient);
+        userPantry.setQuantity(quantity != null ? quantity : 1.0);
+        userPantry.setUnit(unit != null ? unit : "pcs");
 
         return userPantryRepository.save(userPantry);
     }
 
     @Transactional
-    public void removePantryFromUser(Long userId, Long pantryId) {
+    public void removeIngredientFromUserPantry(Long userId, Long ingredientId) {
         userPantryValidator.validateUserExists(userId);
-        userPantryValidator.validateUserPantryExists(userId, pantryId);
+        userPantryValidator.validateUserPantryExists(userId, ingredientId);
 
-        UserPantry userPantry = userPantryRepository.findByUserIdAndPantryId(userId, pantryId).orElseThrow();
+        UserPantry userPantry = userPantryRepository.findByUserIdAndIngredientId(userId, ingredientId).orElseThrow();
         userPantryRepository.delete(userPantry);
     }
 }

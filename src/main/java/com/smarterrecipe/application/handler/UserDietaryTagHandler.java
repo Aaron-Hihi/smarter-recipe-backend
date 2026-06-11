@@ -2,7 +2,7 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserDietaryTag;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.service.UserDietaryTagService;
 import com.smarterrecipe.presentation.dto.userdietarytag.UserDietaryTagRequest;
 import com.smarterrecipe.presentation.dto.userdietarytag.UserDietaryTagResponse;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserDietaryTagHandler {
 
     private final UserDietaryTagService userDietaryTagService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
 
     public List<UserDietaryTagResponse> getMyDietaryTags() {
         Long userId = getAuthenticatedUserId();

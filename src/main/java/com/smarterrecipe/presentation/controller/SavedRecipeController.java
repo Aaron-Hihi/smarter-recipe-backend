@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/saved-recipes")
+@RequestMapping("/api/v1/saved-recipes")
 @RequiredArgsConstructor
 public class SavedRecipeController {
 

@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/creators")
+@RequestMapping("/api/v1/creators")
 @RequiredArgsConstructor
 public class CreatorController {
 

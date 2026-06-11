@@ -8,6 +8,7 @@ public interface RecipeRepository {
     RecipeModel getRecipeById(Long id);
     List<RecipeModel> searchPublishedRecipes(String keyword);
     List<RecipeModel> getPublishedRecipesByTag(String tagName);
+    List<RecipeModel> getRecipesByCreatorId(Long creatorId);
     RecipeModel saveRecipe(RecipeModel recipeModel);
     void deleteRecipe(Long id);
     boolean existsByTitle(String title);

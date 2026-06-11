@@ -2,7 +2,7 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserFollows;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.service.AuditLogService;
 import com.smarterrecipe.domain.service.NotificationService;
 import com.smarterrecipe.domain.service.SocialGraphService;
@@ -22,7 +22,7 @@ public class SocialGraphHandler {
     private final SocialGraphService socialGraphService;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
 
     public List<FollowResponse> getFollowers(Long userId) {
         return socialGraphService.getFollowers(userId).stream()

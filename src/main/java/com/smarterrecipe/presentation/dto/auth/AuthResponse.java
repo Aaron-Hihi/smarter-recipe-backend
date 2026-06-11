@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.smarterrecipe.domain.model.UserModel;
+import com.smarterrecipe.presentation.dto.user.UserResponse;
 
 @Getter @Setter
 @Builder
 @AllArgsConstructor
 public class AuthResponse {
     private String token;
-    private UserModel user;
+    private UserResponse user;
 }

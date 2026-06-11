@@ -2,8 +2,8 @@ package com.smarterrecipe.domain.service;
 
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserFollows;
-import com.smarterrecipe.data.repository.UserFollowsRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserFollowsJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.validator.SocialGraphValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SocialGraphService {
 
-    private final UserFollowsRepository userFollowsRepository;
-    private final UserRepository userRepository;
+    private final UserFollowsJpaRepository userFollowsRepository;
+    private final UserJpaRepository userRepository;
     private final SocialGraphValidator socialGraphValidator;
 
     public List<UserFollows> getFollowers(Long userId) {

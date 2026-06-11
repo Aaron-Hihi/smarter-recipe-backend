@@ -2,8 +2,8 @@ package com.smarterrecipe.domain.service;
 
 import com.smarterrecipe.data.entity.AuditLog;
 import com.smarterrecipe.data.entity.User;
-import com.smarterrecipe.data.repository.AuditLogRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.admin.AuditLogJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuditLogService {
 
-    private final AuditLogRepository auditLogRepository;
-    private final UserRepository userRepository;
+    private final AuditLogJpaRepository auditLogRepository;
+    private final UserJpaRepository userRepository;
 
     @Transactional
     public AuditLog record(Long actorId, String action, String targetType, Long targetId, String details, String ipAddress) {

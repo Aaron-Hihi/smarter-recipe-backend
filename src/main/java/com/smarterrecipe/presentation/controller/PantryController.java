@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/pantry")
+@RequestMapping("/api/v1/pantry")
 @RequiredArgsConstructor
 public class PantryController {
 

@@ -13,6 +13,7 @@ import java.util.List;
 public class RecipeModel {
     private Long id;
     private Long creatorId;
+    private String creatorUsername;
     private String title;
     private String thumbnailUrl;
     private String description;

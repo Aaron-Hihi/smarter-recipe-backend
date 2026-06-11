@@ -1,8 +1,8 @@
 package com.smarterrecipe.domain.validator;
 
 import com.smarterrecipe.data.entity.Notification;
-import com.smarterrecipe.data.repository.NotificationRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.notification.NotificationJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationValidator {
 
-    private final UserRepository userRepository;
-    private final NotificationRepository notificationRepository;
+    private final UserJpaRepository userRepository;
+    private final NotificationJpaRepository notificationRepository;
 
     public void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {

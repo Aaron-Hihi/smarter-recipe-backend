@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserPantryResponse {
     private Long id;
-    private Long pantryId;
-    private String pantryName;
-    private String pantryDescription;
+    private Long ingredientId;
+    private String ingredientName;
+    private Double quantity;
+    private String unit;
 }

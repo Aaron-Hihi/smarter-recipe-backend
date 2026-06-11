@@ -2,7 +2,7 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.User;
 import com.smarterrecipe.data.entity.UserPantry;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.service.UserPantryService;
 import com.smarterrecipe.presentation.dto.userpantry.UserPantryRequest;
 import com.smarterrecipe.presentation.dto.userpantry.UserPantryResponse;
@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 public class UserPantryHandler {
 
     private final UserPantryService userPantryService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
+    private final com.smarterrecipe.domain.service.IngredientService ingredientService;
 
     public List<UserPantryResponse> getMyPantries() {
         Long userId = getAuthenticatedUserId();
@@ -29,13 +30,21 @@ public class UserPantryHandler {
 
     public UserPantryResponse addPantry(UserPantryRequest request) {
         Long userId = getAuthenticatedUserId();
-        UserPantry userPantry = userPantryService.addPantryToUser(userId, request.getPantryId());
+        
+        com.smarterrecipe.domain.model.IngredientModel ingredientModel = ingredientService.findOrCreateByName(request.getIngredientName());
+        
+        UserPantry userPantry = userPantryService.addIngredientToUserPantry(
+            userId, 
+            ingredientModel.getId(), 
+            request.getQuantity(), 
+            request.getUnit()
+        );
         return mapToResponse(userPantry);
     }
 
-    public void removePantry(Long pantryId) {
+    public void removePantry(Long ingredientId) {
         Long userId = getAuthenticatedUserId();
-        userPantryService.removePantryFromUser(userId, pantryId);
+        userPantryService.removeIngredientFromUserPantry(userId, ingredientId);
     }
 
     private Long getAuthenticatedUserId() {
@@ -48,9 +57,10 @@ public class UserPantryHandler {
     private UserPantryResponse mapToResponse(UserPantry userPantry) {
         return new UserPantryResponse(
                 userPantry.getId(),
-                userPantry.getPantry().getId(),
-                userPantry.getPantry().getName(),
-                userPantry.getPantry().getDescription()
+                userPantry.getIngredient().getId(),
+                userPantry.getIngredient().getName(),
+                userPantry.getQuantity(),
+                userPantry.getUnit()
         );
     }
 }

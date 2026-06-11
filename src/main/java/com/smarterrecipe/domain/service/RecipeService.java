@@ -4,6 +4,9 @@ import com.smarterrecipe.domain.model.RecipeModel;
 import com.smarterrecipe.domain.repository.RecipeRepository;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
@@ -34,6 +37,10 @@ public class RecipeService {
 
     public void deleteRecipe(Long id) {
         recipeRepository.deleteRecipe(id);
+    }
+
+    public List<RecipeModel> getRecipesByCreatorId(Long creatorId) {
+        return recipeRepository.getRecipesByCreatorId(creatorId);
     }
 
     public boolean existsByTitle(String title) {

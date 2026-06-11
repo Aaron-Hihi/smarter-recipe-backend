@@ -1,7 +1,7 @@
 package com.smarterrecipe.domain.validator;
 
-import com.smarterrecipe.data.repository.UserFollowsRepository;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserFollowsJpaRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SocialGraphValidator {
 
-    private final UserRepository userRepository;
-    private final UserFollowsRepository userFollowsRepository;
+    private final UserJpaRepository userRepository;
+    private final UserFollowsJpaRepository userFollowsRepository;
 
     public void validateFollowerExists(Long followerId) {
         if (!userRepository.existsById(followerId)) {

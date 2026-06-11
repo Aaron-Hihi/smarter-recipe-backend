@@ -2,7 +2,7 @@ package com.smarterrecipe.application.handler;
 
 import com.smarterrecipe.data.entity.AuditLog;
 import com.smarterrecipe.data.entity.User;
-import com.smarterrecipe.data.repository.UserRepository;
+import com.smarterrecipe.data.repository.user.UserJpaRepository;
 import com.smarterrecipe.domain.service.AuditLogService;
 import com.smarterrecipe.presentation.dto.auditlog.AuditLogResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class AuditLogHandler {
 
     private final AuditLogService auditLogService;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userRepository;
 
     public void log(String action, String targetType, Long targetId, String details, HttpServletRequest request) {
         Long actorId = getAuthenticatedUserId();

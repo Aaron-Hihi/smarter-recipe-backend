@@ -5,6 +5,9 @@ import com.smarterrecipe.domain.model.enums.Role;
 import com.smarterrecipe.domain.repository.UserRepository;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class UserService {
     private final UserRepository repository;
 

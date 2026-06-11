@@ -14,22 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.smarterrecipe.application.dto.AuthResult;
 
+import com.smarterrecipe.application.handler.UserHandler;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthHandler authHandler;
+    private final UserHandler userHandler;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResult result = authHandler.register(request.getName(), request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(result.getUser()).build());
+        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(userHandler.toResponse(result.getUser())).build());
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResult result = authHandler.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(result.getUser()).build());
+        return ResponseEntity.ok(AuthResponse.builder().token(result.getToken()).user(userHandler.toResponse(result.getUser())).build());
     }
 }
